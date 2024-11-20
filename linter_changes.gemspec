@@ -8,8 +8,9 @@ Gem::Specification.new do |spec|
   spec.authors = ['Jose Lara']
   spec.email = ['jvlara@uc.cl']
 
-  spec.summary = 'Runs linters on changes differences based on git, globally or on the file changes depending of the changes'
+  spec.summary = 'Runs linters on code changes based on Git, either globally or only on modified files, depending on the changes.'
   spec.license = 'MIT'
+  spec.homepage = 'https://github.com/bukhr/linter_changes'
   spec.required_ruby_version = ['>= 3.0', '< 4.0']
   spec.bindir = 'bin'
   spec.executables = ['linter_changes']
@@ -38,5 +39,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 1.63.4'
   spec.add_development_dependency 'shoulda-context', '~> 3.0.0.rc1'
   spec.add_development_dependency 'shoulda-matchers', '~> 6.0'
-  spec.add_development_dependency 'sqlite3', '~> 1.4'
 end
