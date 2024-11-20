@@ -5,7 +5,7 @@ require 'thor'
 require_relative 'git_diff'
 require_relative 'logger'
 require_relative 'linter/base'
-require_relative 'linter/rubocop_linter'
+require_relative 'linter/rubocop/adapter'
 require 'pry-byebug'
 
 module LinterChanges
@@ -83,7 +83,7 @@ module LinterChanges
     end
 
     AVAILABLE_LINTERS = {
-      'rubocop' => LinterChanges::Linter::RuboCopLinter
+      'rubocop' => LinterChanges::Linter::RuboCop::Adapter
     }.freeze
   end
 end

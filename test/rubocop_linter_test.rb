@@ -3,20 +3,20 @@
 require 'test_helper'
 
 class RuboCopLinterTest < Minitest::Test
-  context 'LinterChanges::Linter::RuboCopLinter' do
+  context 'LinterChanges::Linter::RuboCop::Adapter' do
     setup do
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
       LinterChanges::GitDiff.any_instance.stubs(:changed_lines_contains?).returns(false)
-      @linter = LinterChanges::Linter::RuboCopLinter.new git_diff: LinterChanges::GitDiff.new(target_branch: 'main')
+      @linter = LinterChanges::Linter::RuboCop::Adapter.new git_diff: LinterChanges::GitDiff.new(target_branch: 'main')
     end
 
     should 'use default config files and command' do
-      assert_equal [/rubocop/], @linter.instance_variable_get(:@config_files)
+      assert_equal ['rubocop'], @linter.instance_variable_get(:@config_files)
       assert_equal 'bin/rubocop', @linter.instance_variable_get(:@command)
     end
 
     should 'allow custom config files and command' do
-      linter = LinterChanges::Linter::RuboCopLinter.new(
+      linter = LinterChanges::Linter::RuboCop::Adapter.new(
         config_files: ['custom.yml'],
         command: 'rubocop --parallel'
       )

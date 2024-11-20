@@ -1,0 +1,5 @@
+---
+# Only regex supported
+config_files:
+  - rubocop
+command: bin/rubocop

@@ -13,9 +13,9 @@ class CLITest < Minitest::Test
 
     should 'run with default options' do
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:config_changed?).returns(false)
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:run).returns(true)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:config_changed?).returns(false)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:run).returns(true)
 
       begin
         @cli.start(@argv)
@@ -26,9 +26,9 @@ class CLITest < Minitest::Test
 
     should 'handle linter failures' do
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:config_changed?).returns(false)
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:run).returns(false)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:config_changed?).returns(false)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:run).returns(false)
 
       begin
         @cli.start(@argv)
@@ -40,9 +40,9 @@ class CLITest < Minitest::Test
     should 'accept custom linters' do
       @argv = ['lint', '--linters', 'rubocop']
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:config_changed?).returns(false)
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:run).returns(true)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:config_changed?).returns(false)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:run).returns(true)
 
       begin
         @cli.start(@argv)
@@ -71,15 +71,15 @@ class CLITest < Minitest::Test
         '--linter-command', 'rubocop:rubocop --parallel'
       ]
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.expects(:initialize).with(
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.expects(:initialize).with(
         config_files: ['.rubocop.yml', 'custom.yml'],
         command: 'rubocop --parallel',
         git_diff: anything
       ).returns(nil)
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:config_changed?).returns(false)
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:run).returns(true)
-      LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:name).returns('rubocop')
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:config_changed?).returns(false)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:run).returns(true)
+      LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:name).returns('rubocop')
       begin
         @cli.start(@argv)
       rescue SystemExit => e

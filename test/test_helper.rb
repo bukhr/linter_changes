@@ -20,5 +20,5 @@ end
 require 'git_diff'
 require 'logger'
 require 'linter/base'
-require 'linter/rubocop_linter'
+require 'linter/rubocop/adapter'
 require 'cli'
