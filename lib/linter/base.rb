@@ -5,10 +5,11 @@ module LinterChanges
     class Base
       attr_reader :name
 
-      def initialize(config_files: nil, command: nil)
+      def initialize(config_files: nil, command: nil, git_diff: nil)
         @name = self.class.name.split('::').last.downcase
         @config_files = config_files || default_config_files
         @command = command || default_command
+        @git_diff = git_diff
       end
 
       # Returns an array of files that the linter targets
@@ -19,7 +20,7 @@ module LinterChanges
       # Checks if any configuration files have changed
       def config_changed?(changed_files)
         changed = @config_files.any? do |pattern|
-          changed_files.any? { |file| File.fnmatch(pattern, file) }
+          changed_files.any? { |file| file.match? pattern }
         end
         Logger.debug "#{@name.capitalize} configuration changed: #{changed}"
         changed

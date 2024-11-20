@@ -24,12 +24,11 @@ module LinterChanges
 
       git_diff = GitDiff.new(target_branch: options[:target_branch])
       changed_files = git_diff.changed_files
-      linters = select_linters
+      linters = select_linters git_diff
       overall_success = true
 
       linters.each do |linter|
         Logger.debug "Running #{linter.name.capitalize} linter"
-
         if linter.config_changed?(changed_files)
           Logger.debug "#{linter.name.capitalize} configuration changed. Running linter globally."
           success = linter.run
@@ -40,7 +39,7 @@ module LinterChanges
             next
           else
             Logger.debug "Linting files with #{linter.name.capitalize}: #{files_to_lint.join(', ')}"
-            success = linter.run(files_to_lint)
+            success = linter.run(files: files_to_lint)
           end
         end
 
@@ -55,13 +54,12 @@ module LinterChanges
     end
 
     no_commands do
-      def select_linters
+      def select_linters git_diff
         linter_names = if options[:linters].empty?
                          AVAILABLE_LINTERS.keys
                        else
                          options[:linters]
                        end
-        # binding.pry
         linter_names.map do |name|
           klass = AVAILABLE_LINTERS[name]
           unless klass
@@ -72,7 +70,7 @@ module LinterChanges
           # Pass custom config files and commands if provided
           config_files = parse_config_files_option(name)
           command = options[:linter_command][name]
-          klass.new(config_files:, command:)
+          klass.new(config_files:, command:, git_diff:)
         end
       end
 

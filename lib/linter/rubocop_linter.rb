@@ -3,11 +3,13 @@
 module LinterChanges
   module Linter
     class RuboCopLinter < Base
-      DEFAULT_CONFIG_FILES = ['.rubocop.yml', 'Gemfile.lock'].freeze
-      DEFAULT_COMMAND = 'rubocop'
+      # TODO: pass this to a yml
+      # By default, anything containing rubocop on the file path will be consider a config file
+      DEFAULT_CONFIG_FILES = [/rubocop/].freeze
+      DEFAULT_COMMAND = 'bin/rubocop'.freeze
 
       def list_target_files
-        cmd = "#{@command} --list-target-files"
+        cmd = "#{DEFAULT_COMMAND} --list-target-files"
         Logger.debug "Executing command: #{cmd}"
 
         stdout, stderr, status = Open3.capture3(cmd)
@@ -16,9 +18,7 @@ module LinterChanges
           exit 1
         end
 
-        files = stdout.strip.split("\n")
-        Logger.debug "RuboCop target files: #{files.join(', ')}"
-        files
+        stdout.strip.split("\n")
       end
 
       def run(files: [])
@@ -28,6 +28,20 @@ module LinterChanges
                 "#{@command} #{files.join(' ')}"
               end
         execute_linter(cmd)
+      end
+
+      def config_changed?(changed_files)
+        # Check if any of the config files have changed
+        return true if super
+
+        # TODO: get the location of Gemfile.lock with bundle command
+        # Check if Gemfile.lock has changed and contains something related to rubocop
+        if changed_files.include?('Gemfile.lock') && @git_diff.changed_lines_contains?(file: 'Gemfile.lock',
+                                                                                       pattern: 'rubocop')
+          Logger.debug 'Something related to rubocop gem version changed in Gemfile.lock'
+          return true
+        end
+        false
       end
 
       private

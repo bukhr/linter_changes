@@ -11,6 +11,8 @@ Gem::Specification.new do |spec|
   spec.summary = 'Runs linters on changes differences based on git, globally or on the file changes depending of the changes'
   spec.license = 'MIT'
   spec.required_ruby_version = ['>= 3.0', '< 4.0']
+  spec.bindir = 'bin'
+  spec.executables = ['linter_changes']
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

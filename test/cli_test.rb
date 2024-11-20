@@ -3,6 +3,7 @@
 require 'test_helper'
 
 class CLITest < Minitest::Test
+  # TODO: test target_branch
   context 'LinterChanges::CLI' do
     setup do
       @argv = ['lint']
@@ -72,7 +73,8 @@ class CLITest < Minitest::Test
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
       LinterChanges::Linter::RuboCopLinter.any_instance.expects(:initialize).with(
         config_files: ['.rubocop.yml', 'custom.yml'],
-        command: 'rubocop --parallel'
+        command: 'rubocop --parallel',
+        git_diff: anything
       ).returns(nil)
       LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:config_changed?).returns(false)
       LinterChanges::Linter::RuboCopLinter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])

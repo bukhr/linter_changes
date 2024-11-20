@@ -12,7 +12,6 @@ module LinterChanges
     end
 
     def changed_files
-      binding.pry
       cmd = "git diff --name-only #{@target_branch}...HEAD"
       Logger.debug "Executing command: #{cmd}"
 
@@ -25,6 +24,16 @@ module LinterChanges
       files = stdout.strip.split("\n")
       Logger.debug "Changed files: #{files.join(', ')}"
       files
+    end
+
+    def changed_lines_contains? file:, pattern:
+      cmd = "git diff #{@target_branch}...HEAD -- #{file}"
+      stdout, stderr, status = Open3.capture3(cmd)
+      unless status.success?
+        Logger.error "Error obtaining git diff for #{file}: #{stderr}"
+        exit 1
+      end
+      stdout.include? pattern
     end
   end
 end
