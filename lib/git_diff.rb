@@ -4,7 +4,7 @@ require 'open3'
 
 module LinterChanges
   class GitDiff
-    DEFAULT_TARGET_BRANCH = 'main'
+    DEFAULT_TARGET_BRANCH = 'origin/master'
 
     def initialize(target_branch: nil)
       @target_branch = target_branch || ENV['CHANGE_TARGET'] || DEFAULT_TARGET_BRANCH
