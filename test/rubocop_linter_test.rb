@@ -7,9 +7,15 @@ class RuboCopLinterTest < Minitest::Test
     setup do
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
       LinterChanges::GitDiff.any_instance.stubs(:changed_lines_contains?).returns(false)
-      @linter = LinterChanges::Linter::RuboCop::Adapter.new git_diff: LinterChanges::GitDiff.new(target_branch: 'main')
+      result_mock = mock
+      result_mock.stubs(:success?).returns(true)
+      target_files_rubocop = ['rubocop.yml', 'app/models/user.rb', 'app/controllers/users_controller.rb']
+      Open3.stubs(:capture3).with('bin/rubocop --list-target-files')
+           .returns([target_files_rubocop.join("\n"), '', result_mock])
+      @linter = LinterChanges::Linter::RuboCop::Adapter.new target_branch: 'main'
     end
 
+    # TODO: test gemfile behaviour
     should 'use default config files and command' do
       assert_equal ['rubocop'], @linter.instance_variable_get(:@config_files)
       assert_equal 'bin/rubocop', @linter.instance_variable_get(:@command)
@@ -35,25 +41,27 @@ class RuboCopLinterTest < Minitest::Test
     end
 
     should 'detect config changes' do
-      changed_files = ['rubocop.yml', 'app/models/user.rb']
-      assert @linter.config_changed?(changed_files)
+      LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['rubocop.yml'])
+      assert @linter.config_changed?
     end
 
     should 'not detect config changes when there are none' do
-      changed_files = ['app/models/user.rb']
-      refute @linter.config_changed?(changed_files)
+      refute @linter.config_changed?
     end
 
     should 'run linter successfully' do
       LinterChanges::Logger.stubs(:debug)
       @linter.expects(:system).with('bin/rubocop app/models/user.rb').returns(true)
-      assert @linter.run(files: ['app/models/user.rb'])
+      assert @linter.run
     end
 
     should 'handle linter failures' do
       LinterChanges::Logger.stubs(:debug)
+      expected_files = ['app/models/user.rb']
+      Open3.expects(:capture3).with('bin/rubocop --list-target-files')
+           .returns([expected_files.join("\n"), '', mock(success?: true)])
       @linter.expects(:system).with('bin/rubocop app/models/user.rb').returns(false)
-      refute @linter.run(files: ['app/models/user.rb'])
+      refute @linter.run
     end
   end
 end

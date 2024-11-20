@@ -12,6 +12,7 @@ module LinterChanges
   class CLI < Thor
     class_option :debug, type: :boolean, default: false, desc: 'Enable debug mode'
     class_option :target_branch, type: :string, default: nil, desc: 'Specify the target branch'
+    class_option :force_global, type: :boolean, default: false, desc: 'Run all linters on global configuration'
 
     desc 'lint', 'Run linters on changed files'
     method_option :linters, type: :array, default: [], desc: 'Specify linters to run (e.g., rubocop,eslint)'
@@ -22,28 +23,11 @@ module LinterChanges
     def lint
       Logger.debug_mode = options[:debug]
 
-      git_diff = GitDiff.new(target_branch: options[:target_branch])
-      changed_files = git_diff.changed_files
-      linters = select_linters git_diff
       overall_success = true
 
-      linters.each do |linter|
+      select_linters.each do |linter|
         Logger.debug "Running #{linter.name.capitalize} linter"
-        if linter.config_changed?(changed_files)
-          Logger.debug "#{linter.name.capitalize} configuration changed. Running linter globally."
-          success = linter.run
-        else
-          files_to_lint = linter.list_target_files & changed_files
-          if files_to_lint.empty?
-            Logger.debug "No files to lint for #{linter.name.capitalize}."
-            next
-          else
-            Logger.debug "Linting files with #{linter.name.capitalize}: #{files_to_lint.join(', ')}"
-            success = linter.run(files: files_to_lint)
-          end
-        end
-
-        overall_success &&= success
+        overall_success &&= linter.run
       end
 
       exit(overall_success ? 0 : 1)
@@ -54,7 +38,7 @@ module LinterChanges
     end
 
     no_commands do
-      def select_linters git_diff
+      def select_linters
         linter_names = if options[:linters].empty?
                          AVAILABLE_LINTERS.keys
                        else
@@ -70,7 +54,7 @@ module LinterChanges
           # Pass custom config files and commands if provided
           config_files = parse_config_files_option(name)
           command = options[:linter_command][name]
-          klass.new(config_files:, command:, git_diff:)
+          klass.new(config_files:, command:, target_branch: options[:target_branch], force_global: options[:force_global])
         end
       end
 
