@@ -4,12 +4,8 @@ module LinterChanges
   module Linter
     module RuboCop
       class Adapter < Base
-        # By default, anything containing rubocop on the file path will be consider a config file
-        DEFAULT_CONFIG_FILES = [/rubocop/].freeze
-        DEFAULT_COMMAND = 'bin/rubocop'.freeze
-
         def list_target_files
-          cmd = "#{DEFAULT_COMMAND} --list-target-files"
+          cmd = "#{@base_command} --list-target-files"
           Logger.debug "Executing command: #{cmd}"
 
           stdout, stderr, status = Open3.capture3(cmd)
@@ -21,16 +17,7 @@ module LinterChanges
           stdout.strip.split("\n")
         end
 
-        def run(files: [])
-          cmd = if files.empty?
-                  @command
-                else
-                  "#{@command} #{files.join(' ')}"
-                end
-          execute_linter(cmd)
-        end
-
-        def config_changed?(changed_files)
+        def config_changed?
           # Check if any of the config files have changed
           return true if super
 
@@ -42,21 +29,6 @@ module LinterChanges
             return true
           end
           false
-        end
-
-        private
-
-        def default_config_files
-          DEFAULT_CONFIG_FILES
-        end
-
-        def default_command
-          DEFAULT_COMMAND
-        end
-
-        def execute_linter(command)
-          Logger.debug "Executing RuboCop command: #{command}"
-          system(command)
         end
       end
     end

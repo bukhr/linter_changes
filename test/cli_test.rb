@@ -74,7 +74,8 @@ class CLITest < Minitest::Test
       LinterChanges::Linter::RuboCop::Adapter.any_instance.expects(:initialize).with(
         config_files: ['.rubocop.yml', 'custom.yml'],
         command: 'rubocop --parallel',
-        git_diff: anything
+        target_branch: nil,
+        force_global: false,
       ).returns(nil)
       LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:config_changed?).returns(false)
       LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])

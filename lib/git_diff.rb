@@ -8,10 +8,12 @@ module LinterChanges
 
     def initialize(target_branch: nil)
       @target_branch = target_branch || ENV['CHANGE_TARGET'] || DEFAULT_TARGET_BRANCH
-      Logger.debug "Target branch: #{@target_branch}"
     end
 
     def changed_files
+      return @changed_files if defined? @changed_files
+
+      Logger.debug "Target branch: #{@target_branch}"
       cmd = "git diff --name-only #{@target_branch}...HEAD"
       Logger.debug "Executing command: #{cmd}"
 
@@ -21,9 +23,9 @@ module LinterChanges
         exit 1
       end
 
-      files = stdout.strip.split("\n")
-      Logger.debug "Changed files: #{files.join(', ')}"
-      files
+      @changed_files = stdout.strip.split("\n")
+      Logger.debug "Changed files: #{@changed_files.join(', ')}"
+      @changed_files
     end
 
     def changed_lines_contains? file:, pattern:
