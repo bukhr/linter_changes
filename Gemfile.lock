@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    linter_changes (0.1.0)
+    linter_changes (0.2.0)
       activesupport (>= 5.0, < 8.0)
       open3
       thor (~> 1.0)
