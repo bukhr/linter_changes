@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'lib/version'
+require_relative 'lib/linter_changes/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'linter_changes'
@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'activesupport', '>= 5.0', '< 8.0'
-  spec.add_runtime_dependency 'open3'
   spec.add_runtime_dependency 'thor', '~> 1.0'
 
   spec.add_development_dependency 'activesupport', '~> 7'

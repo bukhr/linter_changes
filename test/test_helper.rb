@@ -17,8 +17,8 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
-require 'git_diff'
-require 'logger'
-require 'linter/base'
-require 'linter/rubocop/adapter'
-require 'cli'
+require 'linter_changes/git_diff'
+require 'linter_changes/logger'
+require 'linter_changes/linter/base'
+require 'linter_changes/linter/rubocop/adapter'
+require 'linter_changes/cli'
