@@ -5,15 +5,14 @@ module LinterChanges
     class Base
       attr_reader :name
 
-      def initialize(config_files: nil, command: nil, target_branch: nil, force_global: false)
+      def initialize(config_files:, command:, force_global:)
         @name = self.class.name.split('::')[-2].downcase
-        config_file_path = File.expand_path("#{@name}/default_config.yml", __dir__)
-        default_config_file = YAML.load_file(config_file_path)
-        @config_files = config_files || default_config_file['config_files']
-        @command = command || default_config_file['command']
-        @base_command = @command.split(' ').first
-        @git_diff = GitDiff.new(target_branch:)
-        @force_global = force_global
+        @config_files = config_files
+        @command = command
+        @base_command = @command.split(' ').first # used for listing files with in the adaptars
+        @target_branch = ENV['CHANGE_TARGET']
+        @git_diff = GitDiff.new(target_branch: @target_branch)
+        @force_global = force_global || @target_branch.nil?
       end
 
       def changed_files
@@ -27,27 +26,30 @@ module LinterChanges
 
       # Checks if any configuration files have changed
       def config_changed?
-        changed = @config_files.any? do |pattern|
+        @config_files.any? do |pattern|
           changed_files.any? { |file| file.match? Regexp.new(pattern) }
         end
-        changed
       end
 
       # Runs the linter on the specified files
       def run
         if @force_global
-          Logger.debug "#{name.capitalize} forced to run globally."
+          if @target_branch.nil?
+            Logger.debug "[#{name.capitalize}] No git branch provided by CHANGE_TARGET enviroment variable, running globally."
+          else
+            Logger.debug "[#{name.capitalize}] Forced to run globally."
+          end
           execute_linter(@command)
         elsif config_changed?
-          Logger.debug "#{name.capitalize} configuration changed. Running linter globally."
+          Logger.debug "[#{name.capitalize}] Configuration changed. Running linter globally."
           execute_linter(@command)
         else
           files_to_lint = list_target_files & changed_files
           if files_to_lint.empty?
-            Logger.debug "No files to lint for #{name.capitalize}."
+            Logger.debug "No files to lint for [#{name.capitalize}]."
             true
           else
-            Logger.debug "Linting files with #{name.capitalize}: #{files_to_lint.join(', ')}"
+            Logger.debug "Linting files with [#{name.capitalize}]: #{files_to_lint.join(', ')}"
             execute_linter("#{@command} #{files_to_lint.join(' ')}")
           end
         end
@@ -56,7 +58,7 @@ module LinterChanges
       private
 
       def execute_linter(command)
-        Logger.debug "Executing RuboCop command: #{command}"
+        Logger.debug "[#{name.capitalize}] Executing command: #{command}"
         system(command)
       end
     end

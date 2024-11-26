@@ -24,7 +24,7 @@ module LinterChanges
           # TODO: get the location of Gemfile.lock with bundle command
           # Check if Gemfile.lock has changed and contains something related to rubocop
           if changed_files.include?('Gemfile.lock') && @git_diff.changed_lines_contains?(file: 'Gemfile.lock',
-                                                                                        pattern: 'rubocop')
+                                                                                         pattern: 'rubocop')
             Logger.debug 'Something related to rubocop gem version changed in Gemfile.lock'
             return true
           end
