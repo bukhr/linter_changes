@@ -11,8 +11,11 @@ module LinterChanges
         @command = command
         @base_command = @command.split(' ').first # used for listing files with in the adaptars
         @target_branch = ENV['CHANGE_TARGET']
+        # We force origin if the target_branch is present
+        @target_branch = "origin/#{@target_branch}" if !@target_branch.nil? && @target_branch['origin']
         @git_diff = GitDiff.new(target_branch: @target_branch)
         @force_global = force_global || @target_branch.nil?
+        @force_global = true unless @git_diff.references_exists?
       end
 
       def changed_files
@@ -36,6 +39,8 @@ module LinterChanges
         if @force_global
           if @target_branch.nil?
             Logger.debug "[#{name.capitalize}] No git branch provided by CHANGE_TARGET enviroment variable, running globally."
+          elsif !@git_diff.references_exists?
+            Logger.debug "[#{name.capitalize}] Some git reference does not exists locally. Forced to run globally"
           else
             Logger.debug "[#{name.capitalize}] Forced to run globally."
           end

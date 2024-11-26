@@ -7,6 +7,7 @@ class RuboCopLinterTest < Minitest::Test
       ENV['CHANGE_TARGET'] = 'master'
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
       LinterChanges::GitDiff.any_instance.stubs(:changed_lines_contains?).returns(false)
+      LinterChanges::GitDiff.any_instance.stubs(:reference_exists?).returns(true)
       result_mock = mock
       result_mock.stubs(:success?).returns(true)
       target_files_rubocop = ['rubocop.yml', 'app/models/user.rb', 'app/controllers/users_controller.rb']
