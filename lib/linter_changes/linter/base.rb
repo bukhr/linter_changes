@@ -35,7 +35,7 @@ module LinterChanges
       def run
         if @force_global
           if @target_branch.nil?
-            Logger.debug "[#{name.capitalize}] No git branch provided, forced to run globally."
+            Logger.debug "[#{name.capitalize}] No git branch provided by CHANGE_TARGET enviroment variable, running globally."
           else
             Logger.debug "[#{name.capitalize}] Forced to run globally."
           end

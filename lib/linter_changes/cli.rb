@@ -11,8 +11,6 @@ require_relative 'config'
 module LinterChanges
   class CLI < Thor
     class_option :debug, type: :boolean, default: false, desc: 'Enable debug mode'
-    class_option :target_branch, type: :string, default: nil,
-                                 desc: 'Specify the target branch, if nil, it will run globally'
     class_option :force_global, type: :boolean, default: false, desc: 'Run all linters on global configuration'
 
     method_option :linters, type: :array, default: [],
@@ -50,7 +48,7 @@ module LinterChanges
             exit 1
           end
 
-          # TODO: raise if no config files or command found
+          # TODO: raise if no command found
           config_files = @config[name]['config_files'] || []
           command = @config[name]['linter_command']
           klass.new(config_files:, command:, force_global: options[:force_global])

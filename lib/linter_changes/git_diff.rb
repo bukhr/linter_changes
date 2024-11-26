@@ -4,7 +4,7 @@ require 'open3'
 
 module LinterChanges
   class GitDiff
-    def initialize(target_branch: nil)
+    def initialize(target_branch:)
       @target_branch = target_branch
     end
 
