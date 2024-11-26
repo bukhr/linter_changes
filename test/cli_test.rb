@@ -6,9 +6,13 @@ class CLITest < Minitest::Test
   # TODO: test target_branch
   context 'LinterChanges::CLI' do
     setup do
-      @argv = ['lint']
+      @argv = ['lint', '--linters', 'rubocop']
       @cli = LinterChanges::CLI
+      default_config = { 'rubocop' =>
+      { 'linter_command' =>
+        'bin/rubocop --parallel', 'config_files' => ['.rubocop.yml', 'custom.yml'] } }
       LinterChanges::Logger.stubs(:debug)
+      LinterChanges::Config.stubs(:load).returns(default_config)
     end
 
     should 'run with default options' do
@@ -63,19 +67,16 @@ class CLITest < Minitest::Test
       end
     end
 
-    should 'pass custom config files and commands to linters' do
+    should 'pass linters to run by commands if they exists in the yml configuration file at the root of the proyect' do
       @argv = [
         'lint',
-        '--linters', 'rubocop',
-        '--config-files', 'rubocop:.rubocop.yml,custom.yml',
-        '--linter-command', 'rubocop:rubocop --parallel'
+        '--linters', 'rubocop'
       ]
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
       LinterChanges::Linter::RuboCop::Adapter.any_instance.expects(:initialize).with(
         config_files: ['.rubocop.yml', 'custom.yml'],
-        command: 'rubocop --parallel',
-        target_branch: nil,
-        force_global: false,
+        command: 'bin/rubocop --parallel',
+        force_global: false
       ).returns(nil)
       LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:config_changed?).returns(false)
       LinterChanges::Linter::RuboCop::Adapter.any_instance.stubs(:list_target_files).returns(['app/models/user.rb'])
