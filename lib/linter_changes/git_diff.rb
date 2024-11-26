@@ -35,5 +35,24 @@ module LinterChanges
       end
       stdout.include? pattern
     end
+
+    def reference_exists?(ref)
+      system("git rev-parse --verify #{ref} > /dev/null 2>&1")
+    end
+
+    def references_exists?
+      return @references_exist if defined?(@references_exists)
+
+      @references_exist = if !reference_exists?(@target_branch)
+                            Logger.debug("Reference for #{@target_branch} does not exists")
+                            false
+                          elsif !reference_exists?('HEAD')
+                            Logger.debug('Reference for HEAD does not exists')
+                            false
+                          else
+                            true
+                          end
+      @references_exist
+    end
   end
 end
