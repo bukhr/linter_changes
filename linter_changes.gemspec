@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
       file.start_with?(*%w[.git Gemfile Rakefile
                            linter_changes- linter_changes.gemspec test helpers .rubocop.yml .ruby-version CHANGELOG \\
                            CODE_OF_CONDUCT.md
-                           CONTRIBUTING.md LICENSE sorbet tapioca])
+                           CONTRIBUTING.md LICENSE sorbet tapioca .editorconfig])
     end
   end
   spec.require_paths = ['lib']
@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rexml'
-  spec.add_development_dependency 'rubocop', '~> 1.63.4'
+  spec.add_development_dependency 'rubocop', '~> 1.68'
   spec.add_development_dependency 'shoulda-context', '~> 3.0.0.rc1'
   spec.add_development_dependency 'shoulda-matchers', '~> 6.0'
   spec.add_development_dependency 'sorbet'

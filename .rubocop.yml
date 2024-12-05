@@ -22,3 +22,5 @@ Style/RaiseArgs:
   Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
+Layout/LineLength:
+  Max: 180
