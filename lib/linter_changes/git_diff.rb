@@ -1,13 +1,16 @@
-# lib/your_linter_gem/git_diff.rb
+# typed: true
 
 require 'open3'
 
 module LinterChanges
   class GitDiff
+    extend T::Sig
+    sig { params(target_branch: String).void }
     def initialize(target_branch:)
       @target_branch = target_branch
     end
 
+    sig { returns(T::Array[String]) }
     def changed_files
       return @changed_files if defined? @changed_files
 
@@ -26,6 +29,7 @@ module LinterChanges
       @changed_files
     end
 
+    sig { params(file: String, pattern: String).returns(T::Boolean) }
     def changed_lines_contains? file:, pattern:
       cmd = "git diff #{@target_branch}...HEAD -- #{file}"
       stdout, stderr, status = Open3.capture3(cmd)
@@ -36,10 +40,12 @@ module LinterChanges
       stdout.include? pattern
     end
 
+    sig { params(ref: String).returns(T::Boolean) }
     def reference_exists?(ref)
-      system("git rev-parse --verify #{ref} > /dev/null 2>&1")
+      !!system("git rev-parse --verify #{ref} > /dev/null 2>&1")
     end
 
+    sig { returns(T::Boolean) }
     def references_exists?
       return @references_exist if defined?(@references_exists)
 

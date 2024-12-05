@@ -21,12 +21,13 @@ Gem::Specification.new do |spec|
     `git ls-files -z`.split("\x0").reject do |file|
       file.start_with?(*%w[.git Gemfile Rakefile
                            linter_changes- linter_changes.gemspec test helpers .rubocop.yml .ruby-version CHANGELOG CODE_OF_CONDUCT.md
-                           CONTRIBUTING.md LICENSE])
+                           CONTRIBUTING.md LICENSE sorbet tapioca])
     end
   end
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'activesupport', '>= 5.0', '< 8.0'
+  spec.add_runtime_dependency 'sorbet-runtime', '~> 0.5'
   spec.add_runtime_dependency 'thor', '~> 1.0'
 
   spec.add_development_dependency 'activesupport', '~> 7'
@@ -38,4 +39,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 1.63.4'
   spec.add_development_dependency 'shoulda-context', '~> 3.0.0.rc1'
   spec.add_development_dependency 'shoulda-matchers', '~> 6.0'
+  spec.add_development_dependency 'sorbet'
+  spec.add_development_dependency 'tapioca'
 end

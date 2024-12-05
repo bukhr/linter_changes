@@ -1,4 +1,4 @@
-# lib/linter_changes/cli.rb
+# typed: true
 
 require 'bundler/setup'
 require 'thor'
@@ -10,17 +10,21 @@ require_relative 'config'
 
 module LinterChanges
   class CLI < Thor
+    extend T::Sig
+
     class_option :debug, type: :boolean, default: false, desc: 'Enable debug mode'
     class_option :force_global, type: :boolean, default: false, desc: 'Run all linters on global configuration'
 
     method_option :linters, type: :array, default: [],
                             desc: 'Specify linters to run (e.g., rubocop,eslint). If no option provided, will run everything at config file'
     desc 'lint', 'Run linters on changed files'
+
+    sig { returns(T.noreturn) }
     def lint
       Logger.debug_mode = options[:debug]
 
       @config = LinterChanges::Config.load
-      overall_success = true
+      overall_success = T.let(true, T::Boolean)
 
       select_linters.each do |linter|
         Logger.debug "Running #{linter.name.capitalize} linter"
@@ -30,11 +34,14 @@ module LinterChanges
       exit(overall_success ? 0 : 1)
     end
 
+    sig { returns(T::Boolean) }
     def self.exit_on_failure?
       true
     end
 
     no_commands do
+
+      sig { returns(T::Array[LinterChanges::Linter::Base]) }
       def select_linters
         linter_names = @config.keys && options[:linters]
         if linter_names.empty?
