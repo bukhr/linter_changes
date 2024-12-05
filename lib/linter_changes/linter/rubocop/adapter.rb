@@ -1,9 +1,12 @@
-# lib/linter_changes/linter/rubocop/adapter.rb
+# typed: true
 
 module LinterChanges
   module Linter
     module RuboCop
       class Adapter < Base
+        extend T::Sig
+
+        sig { returns(T.any(T::Array[String], T.noreturn)) }
         def list_target_files
           cmd = "#{@base_command} --list-target-files"
           Logger.debug "Executing command: #{cmd}"
@@ -17,6 +20,7 @@ module LinterChanges
           stdout.strip.split("\n")
         end
 
+        sig { returns(T::Boolean) }
         def config_changed?
           # Check if any of the config files have changed
           return true if super
