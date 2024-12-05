@@ -16,7 +16,8 @@ module LinterChanges
     class_option :force_global, type: :boolean, default: false, desc: 'Run all linters on global configuration'
 
     method_option :linters, type: :array, default: [],
-                            desc: 'Specify linters to run (e.g., rubocop,eslint). If no option provided, will run everything at config file'
+                            desc: 'Specify linters to run (e.g., rubocop,eslint). If no option provided, \\
+                                will run everything at config file'
     desc 'lint', 'Run linters on changed files'
 
     sig { returns(T.noreturn) }
@@ -40,7 +41,6 @@ module LinterChanges
     end
 
     no_commands do
-
       sig { returns(T::Array[LinterChanges::Linter::Base]) }
       def select_linters
         linter_names = @config.keys && options[:linters]

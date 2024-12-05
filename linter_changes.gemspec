@@ -8,10 +8,11 @@ Gem::Specification.new do |spec|
   spec.authors = ['Jose Lara']
   spec.email = ['jvlara@uc.cl']
 
-  spec.summary = 'Runs linters on code changes based on Git, either globally or only on modified files, depending on the changes.'
+  spec.summary = 'Runs linters on code changes based on Git, either globally or only on modified files, \\
+                  depending on the changes.'
   spec.license = 'MIT'
   spec.homepage = 'https://github.com/bukhr/linter_changes'
-  spec.required_ruby_version = ['>= 3.0', '< 4.0']
+  spec.required_ruby_version = ['>= 3.0', '< 4.0'] # rubocop:disable Gemspec/RequiredRubyVersion
   spec.bindir = 'bin'
   spec.executables = ['linter_changes']
 
@@ -20,7 +21,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`.split("\x0").reject do |file|
       file.start_with?(*%w[.git Gemfile Rakefile
-                           linter_changes- linter_changes.gemspec test helpers .rubocop.yml .ruby-version CHANGELOG CODE_OF_CONDUCT.md
+                           linter_changes- linter_changes.gemspec test helpers .rubocop.yml .ruby-version CHANGELOG \\
+                           CODE_OF_CONDUCT.md
                            CONTRIBUTING.md LICENSE sorbet tapioca])
     end
   end
