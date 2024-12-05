@@ -4,7 +4,6 @@ require 'test_helper'
 class RuboCopLinterTest < Minitest::Test
   context 'LinterChanges::Linter::RuboCop::Adapter' do
     setup do
-      ENV['CHANGE_TARGET'] = 'master'
       LinterChanges::GitDiff.any_instance.stubs(:changed_files).returns(['app/models/user.rb'])
       LinterChanges::GitDiff.any_instance.stubs(:changed_lines_contains?).returns(false)
       LinterChanges::GitDiff.any_instance.stubs(:reference_exists?).returns(true)
@@ -14,7 +13,7 @@ class RuboCopLinterTest < Minitest::Test
       Open3.stubs(:capture3).with('bin/rubocop --list-target-files')
            .returns([target_files_rubocop.join("\n"), '', result_mock])
       @linter = LinterChanges::Linter::RuboCop::Adapter.new command: 'bin/rubocop', force_global: false,
-                                                            config_files: ['rubocop']
+                                                            config_files: ['rubocop'], target_branch: 'master'
     end
 
     # TODO: test gemfile behaviour
@@ -27,7 +26,8 @@ class RuboCopLinterTest < Minitest::Test
       linter = LinterChanges::Linter::RuboCop::Adapter.new(
         config_files: ['custom.yml'],
         command: 'rubocop --parallel',
-        force_global: false
+        force_global: false,
+        target_branch: 'master'
       )
       assert_equal ['custom.yml'], linter.instance_variable_get(:@config_files)
       assert_equal 'rubocop --parallel', linter.instance_variable_get(:@command)

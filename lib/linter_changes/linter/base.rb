@@ -6,25 +6,56 @@ module LinterChanges
       extend T::Sig
       attr_reader :name
 
-      sig { params(config_files: T::Array[String], command: String, force_global: T::Boolean).void }
-      def initialize(config_files:, command:, force_global:)
+      sig do
+        params(config_files: T::Array[String], command: String, force_global: T::Boolean,
+               target_branch: T.nilable(String)).void
+      end
+      def initialize(config_files:, command:, force_global:, target_branch:)
         @name = T.must(self.class.name).split('::')[-2].then do |adapter_name|
           T.must(adapter_name).downcase
         end
         @config_files = config_files
         @command = command
         @base_command = @command.split(' ').first # used for listing files with in the adaptars
-        @target_branch = ENV['CHANGE_TARGET']
-        # We force origin if the target_branch is present
-        @target_branch = "origin/#{@target_branch}" if !@target_branch.nil? && !@target_branch['origin']
-        @git_diff = GitDiff.new(target_branch: @target_branch) if @target_branch
-        @force_global = force_global || @target_branch.nil?
-        @force_global = true unless @git_diff&.references_exists?
+        @target_branch = target_branch
+        @force_global = force_global
       end
 
       sig { returns(T::Array[String]) }
       def changed_files
-        @git_diff.changed_files
+        T.must(git_diff).changed_files
+      end
+
+      sig { returns(T.nilable(GitDiff)) }
+      def git_diff
+        return @git_diff if defined? @git_diff
+
+        # We force origin if the target_branch is present
+        @target_branch = "origin/#{@target_branch}" if !@target_branch.nil? && !@target_branch['origin']
+        @git_diff = @target_branch ? GitDiff.new(target_branch: @target_branch) : nil
+      end
+
+      sig { returns(T::Boolean) }
+      def force_global_run?
+        return @force_global_run if defined? @force_global_run
+
+        reason =
+          if @target_branch.nil?
+            'No git branch provided, running globally.'
+          elsif !T.must(git_diff).references_exists?
+            'Some git reference does not exist locally. Forced to run globally.'
+          elsif @force_global
+            'Forced to run globally.'
+          elsif config_changed?
+            'Configuration changed. Running linter globally.'
+          end
+
+        if reason
+          Logger.debug "[#{name.capitalize}] #{reason}"
+          true
+        else
+          false
+        end
       end
 
       # Returns an array of files that the linter targets
@@ -44,18 +75,7 @@ module LinterChanges
       # Runs the linter on the specified files
       sig { returns(T::Boolean) }
       def run
-        if @force_global
-          if @target_branch.nil?
-            Logger.debug "[#{name.capitalize}] No git branch provided by CHANGE_TARGET enviroment variable, \\
-              running globally."
-          elsif !@git_diff.references_exists?
-            Logger.debug "[#{name.capitalize}] Some git reference does not exists locally. Forced to run globally"
-          else
-            Logger.debug "[#{name.capitalize}] Forced to run globally."
-          end
-          execute_linter(@command)
-        elsif config_changed?
-          Logger.debug "[#{name.capitalize}] Configuration changed. Running linter globally."
+        if force_global_run?
           execute_linter(@command)
         else
           files_to_lint = list_target_files & changed_files
