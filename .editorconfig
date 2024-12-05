@@ -1,0 +1,33 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+
+# 2 space indentation for ruby
+[{**.rb,**.rake,Gemfile,Rakefile,config.ru,**.erb,**.jbuilder, bin/gitlab, bin/github}]
+indent_style = space
+indent_size = 2
+
+# Indentation for js
+[{app,test,config}/**.{js,vue}]
+indent_style = space
+indent_size = 2
+
+[{app/**.css,app/**.scss}]
+indent_style = space
+indent_size = 2
+
+[{**.yml,Procfile}]
+indent_style = space
+indent_size = 2
+
+# whitespace is meaningful for these files
+[{**.diff,**.patch}]
+trim_trailing_whitespace = false

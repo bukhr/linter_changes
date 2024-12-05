@@ -17,9 +17,7 @@ module LinterChanges
         @target_branch = ENV['CHANGE_TARGET']
         # We force origin if the target_branch is present
         @target_branch = "origin/#{@target_branch}" if !@target_branch.nil? && !@target_branch['origin']
-        if @target_branch
-          @git_diff = GitDiff.new(target_branch: @target_branch)
-        end
+        @git_diff = GitDiff.new(target_branch: @target_branch) if @target_branch
         @force_global = force_global || @target_branch.nil?
         @force_global = true unless @git_diff&.references_exists?
       end
@@ -48,7 +46,8 @@ module LinterChanges
       def run
         if @force_global
           if @target_branch.nil?
-            Logger.debug "[#{name.capitalize}] No git branch provided by CHANGE_TARGET enviroment variable, running globally."
+            Logger.debug "[#{name.capitalize}] No git branch provided by CHANGE_TARGET enviroment variable, \\
+              running globally."
           elsif !@git_diff.references_exists?
             Logger.debug "[#{name.capitalize}] Some git reference does not exists locally. Forced to run globally"
           else

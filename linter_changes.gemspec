@@ -8,10 +8,11 @@ Gem::Specification.new do |spec|
   spec.authors = ['Jose Lara']
   spec.email = ['jvlara@uc.cl']
 
-  spec.summary = 'Runs linters on code changes based on Git, either globally or only on modified files, depending on the changes.'
+  spec.summary = 'Runs linters on code changes based on Git, either globally or only on modified files, \\
+                  depending on the changes.'
   spec.license = 'MIT'
   spec.homepage = 'https://github.com/bukhr/linter_changes'
-  spec.required_ruby_version = ['>= 3.0', '< 4.0']
+  spec.required_ruby_version = ['>= 3.0', '< 4.0'] # rubocop:disable Gemspec/RequiredRubyVersion
   spec.bindir = 'bin'
   spec.executables = ['linter_changes']
 
@@ -20,8 +21,9 @@ Gem::Specification.new do |spec|
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`.split("\x0").reject do |file|
       file.start_with?(*%w[.git Gemfile Rakefile
-                           linter_changes- linter_changes.gemspec test helpers .rubocop.yml .ruby-version CHANGELOG CODE_OF_CONDUCT.md
-                           CONTRIBUTING.md LICENSE sorbet tapioca])
+                           linter_changes- linter_changes.gemspec test helpers .rubocop.yml .ruby-version CHANGELOG \\
+                           CODE_OF_CONDUCT.md
+                           CONTRIBUTING.md LICENSE sorbet tapioca .editorconfig])
     end
   end
   spec.require_paths = ['lib']
@@ -36,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rexml'
-  spec.add_development_dependency 'rubocop', '~> 1.63.4'
+  spec.add_development_dependency 'rubocop', '~> 1.68'
   spec.add_development_dependency 'shoulda-context', '~> 3.0.0.rc1'
   spec.add_development_dependency 'shoulda-matchers', '~> 6.0'
   spec.add_development_dependency 'sorbet'
