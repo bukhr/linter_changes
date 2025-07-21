@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'thor'
+require 'sorbet-runtime'
 
 require_relative 'git_diff'
 require_relative 'logger'
@@ -44,8 +45,6 @@ module LinterChanges
     end
 
     no_commands do
-
-      sig { returns(T::Array[LinterChanges::Linter::Base]) }
       def select_linters
         linter_names = @config.keys && options[:linters]
         if linter_names.empty?
