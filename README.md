@@ -15,8 +15,8 @@ Currently, **LinterChanges** supports **RuboCop** for Ruby code. Support for add
   - [Installation](#installation)
   - [Usage](#usage)
     - [Basic Usage](#basic-usage)
-    - [Specifying the Target Branch](#specifying-the-target-branch)
-    - [Customizing RuboCop Configuration](#customizing-rubocop-configuration)
+    - [CLI](#cli)
+    - [Customizing Configuration](#customizing-configuration)
   - [Contributing](#contributing)
   - [Running the test suite](#running-the-test-suite)
   - [Acknowledgments](#acknowledgments)
@@ -34,75 +34,108 @@ gem 'linter_changes', git: 'https://github.com/bukhr/linter_changes.git'
 ```bash
 bundle install
 ```
+
 ---
 
 ## Usage
 
-LinterChanges provides a command-line interface (CLI) to run RuboCop on the files changed between your current branch and the target branch.
+LinterChanges provides a command-line interface (CLI) to run Linters on the files changed between your current branch and the target branch. Also if you change a configuration file, it will run on the entire repository.
 
 ### Basic Usage
 
 By default, LinterChanges will:
 
-- Compare your current branch with the `main` branch.
-- Run the linters on the changed files that linter listen to.
+- Run globally on all files applying all linters specify in configuration.
+  - The linters will only run on files that the linter listen to.
+- Optionally, if you pass CHANGE_TARGET environment variable to run only on changed files between HEAD and the CHANGE_TARGET branch.
 
 **Command:**
 
 ```bash
-bin/linter_changes lint
+CHANGE_TARGET=origin/master bin/linter_changes lint
 ```
 
 **Example Output:**
 
+```bash
+❯ CHANGE_TARGET=master ./Jenkins/test-scripts/rubocop.sh
+[DEBUG] Using configuration file: .linter_changes.yml
+[DEBUG] Running Rubocop linter
+[DEBUG] Target branch: origin/master
+[DEBUG] Executing command: git diff --name-only origin/master...HEAD
+[DEBUG] Changed files: bin/linter_changes, packs/hcm/core/employee_management/app/models/employee.rb
+[DEBUG] Executing command: bin/rubocop --list-target-files
+[DEBUG] Linting files with [Rubocop]: packs/hcm/core/employee_management/app/models/employee.rb
+[DEBUG] [Rubocop] Executing command: bin/rubocop --parallel --extra-details --display-style-guide --fail-level convention --display-only-fail-level-offenses --format clang packs/hcm/core/employee_management/app/models/employee.rb
+
+1 file inspected, no offenses detected
 ```
-Running RuboCop linter
-Linting files with RuboCop: app/models/user.rb, app/controllers/users_controller.rb
-Inspecting 2 files
-..
 
-2 files inspected, no offenses detected
-```
+### CLI
 
-### Specifying the Target Branch
-
-If you want to compare against a different branch, you can specify it using the `--target-branch` option.
-
-**Command:**
+The `linter_changes` command provides several options to customize its behavior:
 
 ```bash
-bin/linter_changes lint --target-branch origin/master
+bin/linter_changes lint [options]
 ```
 
-This will compare your current branch with the `origin/master` branch.
+**Global Options:**
 
-### Customizing RuboCop Configuration
+- `--debug`: Enable debug mode to see detailed logging information
+- `--force_global`: Force running linters on all files, ignoring git diff
 
-You can customize the RuboCop configuration files and command options.
+**Lint Command Options:**
 
-**Specify Custom Config Files:**
+- `--linters=rubocop,eslint,...`: Specify which linters to run (comma-separated list)
+- `--config_file=PATH`: Path to the configuration file (default: `.linter_changes.yml`)
 
-Note: each config file passed is interpreted as regex on the full file path
+**Environment Variables:**
+
+- `CHANGE_TARGET`: Specify the target branch for comparison (e.g., `CHANGE_TARGET=origin/master`). If not specified, it will run on all files.
+
+**Examples:**
 
 ```bash
-bin/linter_changes lint --config-files rubocop:rubocop,custom_rubocop.yml
+# Run with debug logging
+bin/linter_changes lint --debug
+
+# Force global run regardless of changed files
+bin/linter_changes lint --force_global
+
+# Only run specific linters
+bin/linter_changes lint --linters=rubocop,eslint
+
+# Use a custom config file
+bin/linter_changes lint --config_file=custom_linter_config.yml
+
+# Combine options
+CHANGE_TARGET=main bin/linter_changes lint --debug --linters=rubocop
 ```
 
-**Specify Custom RuboCop Command:**
+### Customizing Configuration
 
-```bash
-bin/linter_changes lint --linter-command rubocop:"rubocop --parallel"
-```
+You can customize the configuration creating a file called `.linter_changes.yml` at the root of your proyect.
 
-**Combining Both:**
+Example:
 
-```bash
-bin/linter_changes lint \
-  --config-files rubocop:.rubocop.yml,custom_rubocop.yml \
-  --linter-command rubocop:"rubocop --parallel"
-```
-
+```yml
 ---
+rubocop:
+  linter_command: "bin/rubocop \
+    --parallel \
+    --extra-details \
+    --display-style-guide \
+    --fail-level convention \
+    --display-only-fail-level-offenses \
+    --format clang"
+  config_files:
+  - "rubocop"
+```
+
+each key represents a linter (e.g., `rubocop`) and inside it you can specify the linter command and the files that trigger a global run of the linter.
+In this example, if a file containing `rubocop` is edited, it would trigger a full run on all the proyect.
+
+Also, if you want to specify another yml file, you can pass it though the cli with the option `--config_file`. The default is `.linter_changes.yml`.
 
 ## Contributing
 
