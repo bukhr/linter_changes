@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'thor'
+
 require_relative 'git_diff'
 require_relative 'logger'
 require_relative 'linter/base'
@@ -17,13 +18,16 @@ module LinterChanges
 
     method_option :linters, type: :array, default: [],
                             desc: 'Specify linters to run (e.g., rubocop,eslint). If no option provided, will run everything at config file'
+    method_option :config_file, type: :string, default: LinterChanges::Config::USER_CONFIG_PATH,
+                        desc: 'Path to the configuration file. Default: $(pwd)/.linter_changes.yml'
     desc 'lint', 'Run linters on changed files'
 
     sig { returns(T.noreturn) }
     def lint
       Logger.debug_mode = options[:debug]
 
-      @config = LinterChanges::Config.load
+      Logger.debug "Using configuration file: #{options[:config_file]}"
+      @config = LinterChanges::Config.load(config_file: options[:config_file])
       overall_success = T.let(true, T::Boolean)
 
       select_linters.each do |linter|
