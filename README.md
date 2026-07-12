@@ -4,7 +4,7 @@ LinterChanges is a Ruby gem that runs linters on files changed between your curr
 
 **What sets LinterChanges apart from other tools like Pronto is that it checks entire files rather than just the changed lines when raising errors. Additionally, if configuration changes for the linter occur, LinterChanges will run the linter on the entire repository, not just on the current changes.**
 
-Currently, **LinterChanges** supports **RuboCop** for Ruby code. Support for additional linters can be added in the future.
+Currently, **LinterChanges** supports **RuboCop** for Ruby code and **ESLint** for JavaScript/Vue. Support for additional linters can be added in the future.
 
 ---
 

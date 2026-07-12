@@ -8,6 +8,7 @@ require_relative 'git_diff'
 require_relative 'logger'
 require_relative 'linter/base'
 require_relative 'linter/rubocop/adapter'
+require_relative 'linter/eslint/adapter'
 require_relative 'config'
 
 module LinterChanges
@@ -67,7 +68,8 @@ module LinterChanges
     end
 
     AVAILABLE_LINTERS = {
-      'rubocop' => LinterChanges::Linter::RuboCop::Adapter
+      'rubocop' => LinterChanges::Linter::RuboCop::Adapter,
+      'eslint' => LinterChanges::Linter::Eslint::Adapter
     }.freeze
   end
 end
