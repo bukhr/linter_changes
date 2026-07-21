@@ -26,11 +26,11 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'activesupport', '>= 5.0', '< 8.0'
+  spec.add_runtime_dependency 'activesupport', '>= 5.0', '< 9.0'
   spec.add_runtime_dependency 'sorbet-runtime', '~> 0.5'
   spec.add_runtime_dependency 'thor', '~> 1.0'
 
-  spec.add_development_dependency 'activesupport', '~> 7'
+  spec.add_development_dependency 'activesupport', '>= 7', '< 9.0'
   spec.add_development_dependency 'minitest', '~> 5.24.1'
   spec.add_development_dependency 'mocha'
   spec.add_development_dependency 'pry-byebug'
