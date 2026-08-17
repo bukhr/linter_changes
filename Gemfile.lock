@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    linter_changes (0.2.0)
-      activesupport (>= 5.0, < 8.0)
+    linter_changes (0.3.1)
+      activesupport (>= 5.0, < 9.0)
       sorbet-runtime (~> 0.5)
       thor (~> 1.0)
 
@@ -120,7 +120,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  activesupport (~> 7)
+  activesupport (>= 7, < 9.0)
   linter_changes!
   minitest (~> 5.24.1)
   mocha
